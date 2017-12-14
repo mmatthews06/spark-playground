@@ -6,7 +6,7 @@
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.ml.Pipeline
 import org.apache.spark.ml.classification.LogisticRegression
-import org.apache.spark.ml.feature.VectorAssembler
+import org.apache.spark.ml.feature.{OneHotEncoder, VectorAssembler}
 import org.apache.spark.mllib.evaluation.MulticlassMetrics
 
 object Main {
@@ -28,11 +28,18 @@ object Main {
     spark.stop()
   }
 
+  // scalastyle:off
   def logisticRegression(data: DataFrame) {
-    // Really poor steps for logistic regression.
     val seed = 42
     val trainSplit = 0.70
     val testSplit = 0.30
+
+    val balanceEncoder = new OneHotEncoder().setInputCol("Account Balance").setOutputCol("balanceOH")
+    val guarantorEncoder = new OneHotEncoder().setInputCol("Guarantors").setOutputCol("guarantorsOH")
+    val paymentStatusEncoder = new OneHotEncoder().setInputCol("Payment Status of Previous Credit").setOutputCol("paymentStatusOH")
+    val maritalStatusEncoder = new OneHotEncoder().setInputCol("Sex & Marital Status").setOutputCol("maritalStatusOH")
+    val currentCreditEncoder = new OneHotEncoder().setInputCol("Concurrent Credits").setOutputCol("currentCreditOH")
+
     val featuresAndLabels = data.select(
       data("Creditability").as("label"),
       $"Account Balance",
@@ -49,36 +56,43 @@ object Main {
 
     val featureExtractor = new VectorAssembler()
         .setInputCols(Array(
-          "Account Balance",
+          "balanceOH",
           "Duration of Credit (month)",
-          "Payment Status of Previous Credit",
+          "paymentStatusOH",
           "Credit Amount",
-          "Sex & Marital Status",
-          "Guarantors",
+          "maritalStatusOH",
+          "guarantorsOH",
           "Age (years)",
-          "Concurrent Credits")
-        )
+          "currentCreditOH"
+        ))
         .setOutputCol("features")
 
     val Array(training, test) = cleanData.randomSplit(Array(trainSplit, testSplit), seed=seed)
 
     val lr = new LogisticRegression()
-    val pipeline = new Pipeline().setStages(Array(featureExtractor, lr))
+    val pipeline = new Pipeline().setStages(Array(
+      balanceEncoder,
+      guarantorEncoder,
+      paymentStatusEncoder,
+      maritalStatusEncoder,
+      currentCreditEncoder,
+      featureExtractor,
+      lr
+    ))
 
     val model = pipeline.fit(training)
     val results = model.transform(test)
 
     evaluateModel(test, results)
   }
+  // scalastyle:on
 
   def evaluateModel(test: DataFrame, results: DataFrame): Unit = {
     // scalastyle:off regex
     val predictionAndLabels = results.select($"prediction",$"label").as[(Double, Double)].rdd
     val metrics = new MulticlassMetrics(predictionAndLabels)
 
-    // Overall Statistics
     val accuracy = metrics.accuracy
-    println("Summary Statistics")
     println(s"Accuracy = $accuracy")
 
     println("Confusion matrix:")
