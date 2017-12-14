@@ -7,10 +7,12 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.ml.Pipeline
 import org.apache.spark.ml.classification.LogisticRegression
 import org.apache.spark.ml.feature.VectorAssembler
+import org.apache.spark.mllib.evaluation.MulticlassMetrics
 
 object Main {
 
   val spark: SparkSession = SparkSession.builder().getOrCreate()
+  import spark.implicits._
 
   def main(args: Array[String] = Array()): Unit = {
     val fileName = if (args.length > 0) args(0) else "./data/german_credit.csv"
@@ -28,7 +30,6 @@ object Main {
 
   def logisticRegression(data: DataFrame) {
     // Really poor steps for logistic regression.
-    import spark.implicits._
     val seed = 42
     val trainSplit = 0.70
     val testSplit = 0.30
@@ -67,6 +68,14 @@ object Main {
     val model = pipeline.fit(training)
     val results = model.transform(test)
 
-    results.select("features", "label", "prediction").show()
+    evaluateModel(test, results)
+  }
+
+  def evaluateModel(test: DataFrame, results: DataFrame): Unit = {
+    val predictionAndLabels = results.select($"prediction",$"label").as[(Double, Double)].rdd
+    val metrics = new MulticlassMetrics(predictionAndLabels)
+
+    println("Confusion matrix:") // scalastyle:ignore
+    println(metrics.confusionMatrix) // scalastyle:ignore
   }
 }
