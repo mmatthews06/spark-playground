@@ -72,21 +72,27 @@ object Main {
   }
 
   def evaluateModel(test: DataFrame, results: DataFrame): Unit = {
+    // scalastyle:off regex
     val predictionAndLabels = results.select($"prediction",$"label").as[(Double, Double)].rdd
     val metrics = new MulticlassMetrics(predictionAndLabels)
 
-    println("Confusion matrix:") // scalastyle:ignore
-    println(metrics.confusionMatrix) // scalastyle:ignore
+    // Overall Statistics
+    val accuracy = metrics.accuracy
+    println("Summary Statistics")
+    println(s"Accuracy = $accuracy")
+
+    println("Confusion matrix:")
+    println(metrics.confusionMatrix)
 
     // Precision by label
     val labels = metrics.labels
     labels.foreach { l =>
-      println(s"Precision($l) = " + metrics.precision(l)) // scalastyle:ignore
+      println(s"Precision($l) = " + metrics.precision(l))
     }
 
     // Recall by label
     labels.foreach { l =>
-      println(s"Recall($l) = " + metrics.recall(l)) // scalastyle:ignore
+      println(s"Recall($l) = " + metrics.recall(l))
     }
   }
 }
