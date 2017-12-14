@@ -1,5 +1,6 @@
 *.class
 *.log
 
+*.idea
 *.swp
 metastore_db
