@@ -77,5 +77,16 @@ object Main {
 
     println("Confusion matrix:") // scalastyle:ignore
     println(metrics.confusionMatrix) // scalastyle:ignore
+
+    // Precision by label
+    val labels = metrics.labels
+    labels.foreach { l =>
+      println(s"Precision($l) = " + metrics.precision(l)) // scalastyle:ignore
+    }
+
+    // Recall by label
+    labels.foreach { l =>
+      println(s"Recall($l) = " + metrics.recall(l)) // scalastyle:ignore
+    }
   }
 }
