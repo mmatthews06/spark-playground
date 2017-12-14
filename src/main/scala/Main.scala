@@ -28,7 +28,6 @@ object Main {
     spark.stop()
   }
 
-  // scalastyle:off
   def logisticRegression(data: DataFrame) {
     val seed = 42
     val trainSplit = 0.70
@@ -41,14 +40,8 @@ object Main {
     val currentCreditEncoder = new OneHotEncoder().setInputCol("Concurrent Credits").setOutputCol("currentCreditOH")
 
     val featuresAndLabels = data.select(
-      data("Creditability").as("label"),
-      $"Account Balance",
-      $"Duration of Credit (month)",
-      $"Payment Status of Previous Credit",
-      $"Credit Amount",
-      $"Sex & Marital Status",
-      $"Guarantors",
-      $"Age (years)",
+      data("Creditability").as("label"), $"Account Balance", $"Duration of Credit (month)",
+      $"Payment Status of Previous Credit", $"Credit Amount", $"Sex & Marital Status", $"Guarantors", $"Age (years)",
       $"Concurrent Credits"
     )
 
@@ -56,14 +49,8 @@ object Main {
 
     val featureExtractor = new VectorAssembler()
         .setInputCols(Array(
-          "balanceOH",
-          "Duration of Credit (month)",
-          "paymentStatusOH",
-          "Credit Amount",
-          "maritalStatusOH",
-          "guarantorsOH",
-          "Age (years)",
-          "currentCreditOH"
+          "balanceOH", "paymentStatusOH", "maritalStatusOH", "guarantorsOH", "currentCreditOH",
+          "Duration of Credit (month)", "Credit Amount", "Age (years)"
         ))
         .setOutputCol("features")
 
@@ -85,7 +72,6 @@ object Main {
 
     evaluateModel(test, results)
   }
-  // scalastyle:on
 
   def evaluateModel(test: DataFrame, results: DataFrame): Unit = {
     // scalastyle:off regex
