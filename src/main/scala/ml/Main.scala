@@ -2,18 +2,21 @@
 // See the LICENCE.txt file distributed with this work for additional
 // information regarding copyright ownership.
 //
+package ml
 
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import ml.FeatureEngineering._
+import org.apache.log4j.{Level, Logger}
 import org.apache.spark.ml.Pipeline
 import org.apache.spark.ml.classification.LogisticRegression
 import org.apache.spark.ml.feature.VectorAssembler
 import org.apache.spark.mllib.evaluation.MulticlassMetrics
-
-import FeatureEngineering._
+import org.apache.spark.sql.{DataFrame, SparkSession}
 
 object Main {
+  Logger.getLogger("org").setLevel(Level.ERROR)
 
   val spark: SparkSession = SparkSession.builder().getOrCreate()
+  spark.sparkContext.setLogLevel("ERROR")
   import spark.implicits._
 
   def main(args: Array[String] = Array()): Unit = {
@@ -26,6 +29,8 @@ object Main {
       .load(fileName)
 
     logisticRegression(data)
+    val pca = PCAModel.run(data)
+    pca.show()
 
     spark.stop()
   }
@@ -71,12 +76,12 @@ object Main {
     val model = pipeline.fit(training)
     val results = model.transform(test)
 
-    evaluateModel(test, results)
+    evaluateModel(results)
   }
 
-  def evaluateModel(test: DataFrame, results: DataFrame): Unit = {
+  def evaluateModel(results: DataFrame): Unit = {
     // scalastyle:off regex
-    val predictionAndLabels = results.select($"prediction",$"label").as[(Double, Double)].rdd
+    val predictionAndLabels = results.select($"prediction", $"label").as[(Double, Double)].rdd
     val metrics = new MulticlassMetrics(predictionAndLabels)
 
     val accuracy = metrics.accuracy

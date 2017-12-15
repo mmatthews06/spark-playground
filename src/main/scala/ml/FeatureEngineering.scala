@@ -1,3 +1,9 @@
+// Copyright (C) 2017 Michael Matthews.
+// See the LICENCE.txt file distributed with this work for additional
+// information regarding copyright ownership.
+//
+package ml
+
 import org.apache.spark.ml.feature.OneHotEncoder
 
 object FeatureEngineering {
