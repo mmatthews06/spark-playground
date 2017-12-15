@@ -9,10 +9,18 @@ import org.apache.spark.ml.classification.LogisticRegression
 import org.apache.spark.ml.feature.{OneHotEncoder, VectorAssembler}
 import org.apache.spark.mllib.evaluation.MulticlassMetrics
 
+object FeatureEngineering {
+  implicit class StringEngineering(col1: String) {
+    def oneHot(col2: String): OneHotEncoder = new OneHotEncoder().setInputCol(col1).setOutputCol(col2)
+  }
+}
+
 object Main {
 
   val spark: SparkSession = SparkSession.builder().getOrCreate()
+
   import spark.implicits._
+  import FeatureEngineering._
 
   def main(args: Array[String] = Array()): Unit = {
     val fileName = if (args.length > 0) args(0) else "./data/german_credit.csv"
@@ -33,11 +41,11 @@ object Main {
     val trainSplit = 0.70
     val testSplit = 0.30
 
-    val balanceEncoder = new OneHotEncoder().setInputCol("Account Balance").setOutputCol("balanceOH")
-    val guarantorEncoder = new OneHotEncoder().setInputCol("Guarantors").setOutputCol("guarantorsOH")
-    val paymentStatusEncoder = new OneHotEncoder().setInputCol("Payment Status of Previous Credit").setOutputCol("paymentStatusOH")
-    val maritalStatusEncoder = new OneHotEncoder().setInputCol("Sex & Marital Status").setOutputCol("maritalStatusOH")
-    val currentCreditEncoder = new OneHotEncoder().setInputCol("Concurrent Credits").setOutputCol("currentCreditOH")
+    val balanceEncoder = "Account Balance" oneHot "balanceOH"
+    val guarantorEncoder = "Guarantors" oneHot "guarantorsOH"
+    val paymentStatusEncoder = "Payment Status of Previous Credit" oneHot "paymentStatusOH"
+    val maritalStatusEncoder = "Sex & Marital Status" oneHot "maritalStatusOH"
+    val currentCreditEncoder = "Concurrent Credits" oneHot "currentCreditOH"
 
     val featuresAndLabels = data.select(
       data("Creditability").as("label"), $"Account Balance", $"Duration of Credit (month)",
