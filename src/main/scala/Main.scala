@@ -9,18 +9,12 @@ import org.apache.spark.ml.classification.LogisticRegression
 import org.apache.spark.ml.feature.{OneHotEncoder, VectorAssembler}
 import org.apache.spark.mllib.evaluation.MulticlassMetrics
 
-object FeatureEngineering {
-  implicit class StringEngineering(col1: String) {
-    def oneHot(col2: String): OneHotEncoder = new OneHotEncoder().setInputCol(col1).setOutputCol(col2)
-  }
-}
+import FeatureEngineering._
 
 object Main {
 
   val spark: SparkSession = SparkSession.builder().getOrCreate()
-
   import spark.implicits._
-  import FeatureEngineering._
 
   def main(args: Array[String] = Array()): Unit = {
     val fileName = if (args.length > 0) args(0) else "./data/german_credit.csv"
@@ -54,6 +48,7 @@ object Main {
     )
 
     val cleanData = featuresAndLabels.na.drop()
+    val Array(training, test) = cleanData.randomSplit(Array(trainSplit, testSplit), seed=seed)
 
     val featureExtractor = new VectorAssembler()
         .setInputCols(Array(
@@ -61,8 +56,6 @@ object Main {
           "Duration of Credit (month)", "Credit Amount", "Age (years)"
         ))
         .setOutputCol("features")
-
-    val Array(training, test) = cleanData.randomSplit(Array(trainSplit, testSplit), seed=seed)
 
     val lr = new LogisticRegression()
     val pipeline = new Pipeline().setStages(Array(
