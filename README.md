@@ -32,7 +32,8 @@ spark-submit --master local[*] spark-playground_2.11-0.1.jar ../../data/german_c
 ```
 
 # Models
-### Logistic Regression
+### Classification
+##### Logistic Regression
 Currently implemented with some random features from the data set, but the initial evaluation numbers have already improved with more correct feature engineering (one hot encoding for categorical data). `Creditability` is the class we're trying to predict. Current numbers:
 ```
 Accuracy = 0.7284768211920529
@@ -46,8 +47,23 @@ Recall(1.0) = 0.8616071428571429
 ```
 Not great, but probably fair for one day, and will hopefully improve. Obviously, more explanation is needed in this section, as well.
 
-### Principal Component Analysis
-As with logistic regression, this is only in a "first implementation" stage. It executes, and prints some information out.
+##### Decision Tree
+As with the others, this is a first implementation. The very first evaluation numbers are worse than logistic regression. Again, these are randomly picked features.
+```
+---------- Decision Tree ----------
+Accuracy = 0.7086092715231788
+Confusion matrix:
+34.0  44.0
+44.0  180.0
+Precision(0.0) = 0.4358974358974359
+Precision(1.0) = 0.8035714285714286
+Recall(0.0) = 0.4358974358974359
+Recall(1.0) = 0.8035714285714286
+```
+
+### Misc.
+##### Principal Component Analysis
+For future feature engineering, this is an implementation of PCA. As with the others, this is a "first implementation" stage. It executes, and prints some information out.
 
 # Credits
 ##### German Credit Data
