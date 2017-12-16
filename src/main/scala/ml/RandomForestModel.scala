@@ -36,17 +36,21 @@ object RandomForestModel {
       )
       .model(classifier)
 
+    val Array(training, test)  = data.select(
+        data("Creditability").as("label"),
+        $"Account Balance",
+        $"Duration of Credit (month)",
+        $"Payment Status of Previous Credit",
+        $"Credit Amount",
+        $"Sex & Marital Status",
+        $"Guarantors",
+        $"Age (years)",
+        $"Concurrent Credits"
+      )
+      .na.drop()
+      .randomSplit(Array(trainSplit, testSplit), seed=seed)
+
     val pipeline = new Pipeline().setStages(pipelineBuilder.build())
-
-    val featuresAndLabels = data.select(
-      data("Creditability").as("label"), $"Account Balance", $"Duration of Credit (month)",
-      $"Payment Status of Previous Credit", $"Credit Amount", $"Sex & Marital Status", $"Guarantors", $"Age (years)",
-      $"Concurrent Credits"
-    )
-
-    val cleanData = featuresAndLabels.na.drop()
-    val Array(training, test) = cleanData.randomSplit(Array(trainSplit, testSplit), seed=seed)
-
     val model = pipeline.fit(training)
     model.transform(test)
   }
