@@ -61,6 +61,20 @@ Recall(0.0) = 0.4358974358974359
 Recall(1.0) = 0.8035714285714286
 ```
 
+##### Random Forest
+Same as the others, this is a first implementation. Initial evaluation numbers:
+```
+---------- Random Forest ----------
+Accuracy = 0.7218543046357616
+Confusion matrix:
+15.0  63.0
+21.0  203.0
+Precision(0.0) = 0.4166666666666667
+Precision(1.0) = 0.7631578947368421
+Recall(0.0) = 0.19230769230769232
+Recall(1.0) = 0.90625
+```
+
 ### Misc.
 ##### Principal Component Analysis
 For future feature engineering, this is an implementation of PCA. As with the others, this is a "first implementation" stage. It executes, and prints some information out.
