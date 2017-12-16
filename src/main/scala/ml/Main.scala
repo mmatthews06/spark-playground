@@ -37,6 +37,11 @@ object Main {
     val decisionTreeResults = DecisionTreeModel.run(data)
     evaluateModel(decisionTreeResults)
 
+    // Random Forest Model
+    println("\n" + "-" * 10 + " Random Forest " + "-" * 10) // scalastyle:ignore
+    val randomForestResults = RandomForestModel.run(data)
+    evaluateModel(randomForestResults)
+
     // PCA run
     println("\n" + "-" * 10 + " Principal Component Analysis " + "-" * 10) // scalastyle:ignore
     val pca = PCAModel.run(data)
