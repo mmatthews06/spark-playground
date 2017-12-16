@@ -28,7 +28,17 @@ object Main {
       .format("csv")
       .load(fileName)
 
+    // Logistic Regression Model
+    println("\n" + "-" * 10 + " Logistic Regression " + "-" * 10) // scalastyle:ignore
     logisticRegression(data)
+
+    // Decision Tree Model
+    println("\n" + "-" * 10 + " Decision Tree " + "-" * 10) // scalastyle:ignore
+    val decisionTreeResults = DecisionTreeModel.run(data)
+    evaluateModel(decisionTreeResults)
+
+    // PCA run
+    println("\n" + "-" * 10 + " Principal Component Analysis " + "-" * 10) // scalastyle:ignore
     val pca = PCAModel.run(data)
     pca.show()
 
