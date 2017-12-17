@@ -36,7 +36,7 @@ object RandomForestModel {
       )
       .model(classifier)
 
-    val Array(training, test)  = data.select(
+    val Array(training, test) = data.select(
         data("Creditability").as("label"),
         $"Account Balance",
         $"Duration of Credit (month)",
