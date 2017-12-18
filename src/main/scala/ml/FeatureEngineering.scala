@@ -12,10 +12,10 @@ object FeatureEngineering {
   }
 
   implicit class VectorAssemblerEngineering(list1: Seq[String]) {
-    def extract(): VectorAssembler = {
+    def extract(outputColumn: String = "features"): VectorAssembler = {
       new VectorAssembler()
         .setInputCols(list1.toArray)
-        .setOutputCol("features")
+        .setOutputCol(outputColumn)
     }
   }
 }
