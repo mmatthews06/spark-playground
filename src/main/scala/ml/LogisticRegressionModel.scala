@@ -6,6 +6,8 @@ package ml
 
 import org.apache.spark.ml.Pipeline
 import org.apache.spark.ml.classification.LogisticRegression
+import org.apache.spark.ml.evaluation.BinaryClassificationEvaluator
+import org.apache.spark.ml.tuning.{ParamGridBuilder, TrainValidationSplit}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 object LogisticRegressionModel {
@@ -13,11 +15,20 @@ object LogisticRegressionModel {
   import spark.implicits._
 
   def run(data: DataFrame): DataFrame = {
+    // scalastyle:off magic.number
     val seed = 42
     val trainSplit = 0.70
     val testSplit = 0.30
 
-    val classifier = new LogisticRegression()
+    val lr = new LogisticRegression()
+    val paramGrid = new ParamGridBuilder().addGrid(lr.regParam, Array(1000, 0.001)).build()
+    val trainValidationSplit = new TrainValidationSplit()
+      .setEstimator(lr)
+      .setEvaluator(new BinaryClassificationEvaluator())
+      .setEstimatorParamMaps(paramGrid)
+      .setTrainRatio(0.8)
+
+
     val pipelineBuilder = new PipelineBuilder()
       .oneHot("Account Balance", "balanceOH")
       .oneHot("Guarantors", "guarantorsOH")
@@ -34,7 +45,7 @@ object LogisticRegressionModel {
         "Credit Amount",
         "Age (years)"
       )
-      .model(classifier)
+      .model(trainValidationSplit)
 
     val Array(training, test) = data.select(
         data("Creditability").as("label"),
