@@ -7,7 +7,7 @@ package ml
 import org.apache.spark.ml.feature.{OneHotEncoder, VectorAssembler}
 
 object FeatureEngineering {
-  implicit class StringEngineering(col1: String) {
+  implicit class OneHotEngineering(col1: String) {
     def oneHot(col2: String): OneHotEncoder = new OneHotEncoder().setInputCol(col1).setOutputCol(col2)
   }
 
