@@ -12,7 +12,7 @@ class PipelineBuilder(pipeline: List[PipelineStage] = List[PipelineStage]()) {
 
   def build(): Array[PipelineStage] = pipeline.toArray
 
-  def features(features: String*): PipelineBuilder = new PipelineBuilder(pipeline :+ features.extract)
+  def features(features: String*): PipelineBuilder = new PipelineBuilder(pipeline :+ (features extract "features"))
 
   def model(model: PipelineStage): PipelineBuilder = new PipelineBuilder(pipeline :+ model)
 
